@@ -7,7 +7,7 @@ use File::Spec;
 
 BEGIN { use_ok 'Test::XPath' or die; }
 
-my $html = '<html><head><title>Hello</title><body><p class="foo"><em><b>first</b></em></p><p><em><b>post</b></em></p></body></html>';
+my $html = '<html><head><title>Hello</title><body><p class="foo" align="left"><em><b>first</b></em></p><p align="right"><em><b>post</b></em></p></body></html>';
 
 ok my $xp = Test::XPath->new(
     xml     => $html,
@@ -64,6 +64,11 @@ test_test(
 
 # Try multiples.
 $xp->is('/html/body/p', 'firstpost', 'Should work for multiples');
+is_deeply(
+    [ map { $_->value } $xp->xpc->findnodes('/html/body/p/@align') ], 
+    ['left', 'right'], 
+    'Multiples, separately',
+);
 
 # Try an attribute.
 $xp->is('/html/body/p/@class', 'foo', 'Should get attribute value');
@@ -110,6 +115,6 @@ test_test('not_ok works');
 
 # Try failed ok.
 test_out('not ok 1 - whatever');
-test_err(qq{#   Failed test 'whatever'\n#   at $file line 114.});
+test_err(qq{#   Failed test 'whatever'\n#   at $file line 119.});
 $xp->not_ok('/html/head/title', 'whatever');
 test_test('not_ok fail works');
